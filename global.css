@@ -1,0 +1,90 @@
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* Fonts */
+  --text-regular-normal: Roboto;
+  --heading-desktop-h1: "Goudy Bookletter 1911";
+  --heading-desktop-h2: Merriweather;
+  --heading-desktop-h3: "Crimson Pro";
+  --heading-desktop-tagline: "Cormorant Garamond";
+
+  /* font sizes */
+  --text-tiny-normal-size: 12px;
+  --text-small-normal-size: 14px;
+  --text-regular-normal-size: 16px;
+  --text-medium-normal-size: 18px;
+  --font-size-lgi: 19px;
+  --text-large-semi-bold-size: 20px;
+  --heading-desktop-h5-size: 24px;
+  --font-size-6xl: 25px;
+  --font-size-7xl: 26px;
+  --heading-desktop-h4-size: 32px;
+  --font-size-15xl: 34px;
+  --heading-desktop-h3-size: 40px;
+  --heading-desktop-h2-size: 42px;
+  --font-size-24xl: 43px;
+  --font-size-39xl: 58px;
+  --heading-desktop-h1-size: 72px;
+
+  /* Colors */
+  --color-wheat-100: #e5d8b3;
+
+  /* Gaps */
+  --gap-0: 0px;
+  --gap-9xs: 4px;
+  --gap-5xs: 8px;
+  --gap-xs: 12px;
+  --gap-sm: 14px;
+  --gap-base: 16px;
+  --gap-lgi: 19px;
+  --gap-xl: 20px;
+  --gap-5xl: 24px;
+  --gap-13xl: 32px;
+  --gap-21xl: 40px;
+  --gap-29xl: 48px;
+  --gap-30xl: 49px;
+  --gap-61xl: 80px;
+
+  /* Paddings */
+  --padding-10xs-5: 2.5px;
+  --padding-9xs: 4px;
+  --padding-5xs: 8px;
+  --padding-3xs: 10px;
+  --padding-xs: 12px;
+  --padding-smi: 13px;
+  --padding-base: 16px;
+  --padding-xl: 20px;
+  --padding-4xl: 23px;
+  --padding-5xl: 24px;
+  --padding-8xl: 27px;
+  --padding-10xl: 29px;
+  --padding-12xl: 31px;
+  --padding-13xl: 32px;
+  --padding-21xl: 40px;
+  --padding-22xl: 41px;
+  --padding-28xl: 47px;
+  --padding-29xl: 48px;
+  --padding-43xl: 62px;
+  --padding-45xl: 64px;
+  --padding-54xl: 73px;
+  --padding-61xl: 80px;
+  --padding-93xl: 112px;
+  --padding-149xl: 168px;
+  --padding-229xl: 248px;
+
+  /* Border radiuses */
+  --br-26xl: 45px;
+  --br-81xl: 100px;
+
+  /* Figma Variables */
+
+  /* Color Variables */
+  --background: #f4e5ba;
+  --border-error: #b42318;
+  --border-primary: #000;
+  --color-neutral-neutral: #666;
+  --text-alternate: #fff;
+}
