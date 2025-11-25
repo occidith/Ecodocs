@@ -342,73 +342,73 @@
         </div>
       </section>
       
-    <!-- =====  RIVER-TO-COMMUNITY HEAT MAP  (FIXED)  ===== -->
-      <section style="background:#EFE7BC; padding:60px 20px; text-align:center; color:#000000;">
-        <h2 style="margin-bottom:20px;">Flood Vulnerable Communities</h2>
-        <div id="map" style="width:100%; height:600px; margin:20px auto 0;"></div>
-      </section>
+   <!-- =====  RIVER-TO-COMMUNITY HEAT MAP  (FIXED)  ===== -->
+<section style="background:#EFE7BC; padding:60px 20px; text-align:center; color:#000000;">
+  <h1 style="margin-bottom:20px;">Flood Vulnerable Communities</h1>
+  <div id="map" style="width:100%; height:600px; margin:20px auto 0;"></div>
+</section>
 
-      <script>
-        const communities = [
-          [28.6800,  69.9000,   28.6873,  69.9535,  1.5, "Rojhan"],
-          [28.637671,69.967076, 28.6500,  69.9400,  0.5, "Kot Mithan"],
-          [30.5140,  70.8580,   30.7107,  70.6475,  0.2, "Taunsa Sharif"],
-          [29.021950,70.605799, 29.0230,  70.6200,  0.5, "Hairo"],
-          [32.627329,73.314031, 32.640921,73.31038, 0.3, "Abdullahpur"],
-          [32.578445,73.040105, 32.588872,73.043268,0.2, "Kandala / Pind Dadan Khan"],
-          [30.025913,71.222508, 30.070021,71.195514,1.5, "Muzaffargarh"]
-        ];
+<script>
+  const communities = [
+    [28.6800,  69.9000,   28.6873,  69.9535,  1.5, "Rojhan"],
+    [28.637671,69.967076, 28.6500,  69.9400,  0.5, "Kot Mithan"],
+    [30.5140,  70.8580,   30.7107,  70.6475,  0.2, "Taunsa Sharif"],
+    [29.021950,70.605799, 29.0230,  70.6200,  0.5, "Hairo"],
+    [32.627329,73.314031, 32.640921,73.31038, 0.3, "Abdullahpur"],
+    [32.578445,73.040105, 32.588872,73.043268,0.2, "Kandala / Pind Dadan Khan"],
+    [30.025913,71.222508, 30.070021,71.195514,1.5, "Muzaffargarh"]
+  ];
 
-        function initMap(){
-          const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 6,
-            center: {lat:30.5, lng:71},
-            mapTypeId:"terrain",
-            styles:[{featureType:"all", elementType:"labels", stylers:[{visibility:"off"}]}]
-          });
+  function initMap(){
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 6,
+      center: {lat:30.5, lng:71},
+      mapTypeId:"terrain",
+      styles:[{featureType:"all", elementType:"labels", stylers:[{visibility:"off"}]}]
+    });
 
-          communities.forEach(([rLat, rLng, tLat, tLng, extKm, name]) => {
-            const river = new google.maps.LatLng(rLat, rLng);
-            const town  = new google.maps.LatLng(tLat, tLng);
-            const legM  = google.maps.geometry.spherical.computeDistanceBetween(river, town);
-            const heading = google.maps.geometry.spherical.computeHeading(river, town);
-            const totalM = legM + extKm * 1000;
+    communities.forEach(([rLat, rLng, tLat, tLng, extKm, name]) => {
+      const river = new google.maps.LatLng(rLat, rLng);
+      const town  = new google.maps.LatLng(tLat, tLng);
+      const legM  = google.maps.geometry.spherical.computeDistanceBetween(river, town);
+      const heading = google.maps.geometry.spherical.computeHeading(river, town);
+      const totalM = legM + extKm * 1000;
 
-            const points = [];
-            const steps  = 200;                 // smoother fall-off
-            for(let i=0; i<=steps; i++){
-              const distM = (totalM * i) / steps;
-              const pos   = google.maps.geometry.spherical.computeOffset(river, distM, heading);
-              const w     = Math.max(0, 1 - distM / totalM); // 1→0 exactly at limit
-              points.push({location:pos, weight:w});
-            }
+      const points = [];
+      const steps  = 200;
+      for(let i=0; i<=steps; i++){
+        const distM = (totalM * i) / steps;
+        const pos   = google.maps.geometry.spherical.computeOffset(river, distM, heading);
+        const w     = (distM >= totalM) ? 0 : 1 - (distM / totalM); // force 0 at limit
+        points.push({location:pos, weight:w});
+      }
 
-            new google.maps.visualization.HeatmapLayer({
-              data: points,
-              map: map,
-              radius: 25,                        // tighter = cleaner edge
-              gradient: [
-                "rgba(255, 40,  40, 1)",   // red core
-                "rgba(255, 140, 0,  1)",   // orange mid
-                "rgba(255, 180, 70, 0)"    // transparent at edge
-              ],
-              opacity: 0.9
-            });
+      new google.maps.visualization.HeatmapLayer({
+        data: points,
+        map: map,
+        radius: 18,                            // tighter blur
+        gradient: [
+          "rgba(255, 40,  40, 1)",   // red
+          "rgba(255, 140, 0,  1)",   // orange
+          "rgba(255, 180, 70, 0)"    // transparent
+        ],
+        opacity: 0.9
+      });
 
-            new google.maps.Marker({
-              position: town,
-              map: map,
-              title: name,
-              icon: {url:"http://maps.google.com/mapfiles/ms/icons/orange-dot.png"}
-            });
-          });
-        }
-      </script>
+      new google.maps.Marker({
+        position: town,
+        map: map,
+        title: name,
+        icon:{url:"http://maps.google.com/mapfiles/ms/icons/orange-dot.png"}
+      });
+    });
+  }
+</script>
 
-      <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnWQ_a5FSTJzITSMiufTCF9dWzDqdZ5Yc&libraries=visualization,geometry&callback=initMap">
-      </script>
-      <!-- =====  END HEAT MAP  ===== -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnWQ_a5FSTJzITSMiufTCF9dWzDqdZ5Yc&libraries=visualization,geometry&callback=initMap">
+</script>
+<!-- =====  END HEAT MAP  ===== -->
     
     
     
