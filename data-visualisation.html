@@ -100,31 +100,6 @@
                 Data Analysis
               </h1>
               <div class="lorem-ipsum-dolor">
-                Our advanced spectrometry techniques utilise optical fibre-based
-                detectors to gather real-time pollution data. By analysing light
-                spectra, we can accurately identify and monitor airborne
-                pollutants, ensuring timely insights into air quality.
-              </div>
-            </div>
-          </div>
-          <img
-            class="placeholder-image-icon5"
-            loading="lazy"
-            alt=""
-            src="./public/placeholder-image-11@2x.png"
-          />
-        </div>
-      </section>
-      <section class="layout-246">
-        <div class="section-title5">
-          <div class="column18">
-            <h1 class="number">
-              Understanding our flood risk analysis
-            </h1>
-          </div>
-          <div class="column19">
-            <div class="text-suspendisse-varius-container">
-              <p class="our-system-employs">
                 Our system employs a high-precision Blue Wave spectrometer by
                 StellarNet, which is positioned to observe the sky. The
                 spectrometer collects incoming light across various wavelengths,
@@ -153,6 +128,43 @@
                 collecting spectral data, our system can track pollution
                 fluctuations over time, identifying peak pollution hours and
                 seasonal variations.
+              </p>
+              </div>
+            </div>
+          </div>
+          <img
+            class="placeholder-image-icon5"
+            loading="lazy"
+            alt=""
+            src="./public/placeholder-image-11@2x.png"
+          />
+        </div>
+      </section>
+      <section class="layout-246">
+        <div class="section-title5">
+          <div class="column18">
+            <h1 class="number">
+              Understanding our flood risk analysis
+            </h1>
+          </div>
+          <div class="column19">
+            <div class="text-suspendisse-varius-container">
+              <p class="our-system-employs">
+               At EcoDocs, we leverage advanced UAV technology 
+                and high-resolution imaging to provide precise, 
+                real-time flood risk assessments across Pakistan’s 
+                rivers and communities. Our drones capture optical, 
+                multispectral, and thermal data to monitor river water 
+                levels, flow rates, soil saturation, and surrounding land 
+                conditions. By analyzing changes in river morphology, 
+                sediment buildup, and local moisture levels, we can detect 
+                areas most susceptible to flooding before water overtops the 
+                banks. This data is processed through intelligent models that 
+                translate complex environmental signals into clear, actionable 
+                flood-risk maps, helping communities, planners, and responders 
+                make timely decisions to reduce damage and protect lives.
+              </p>
+        
               </p>
               <p class="our-system-employs">&nbsp;</p>
               <p class="our-system-employs">&nbsp;</p>
@@ -382,5 +394,91 @@
         </div>
       </section>
     </div>
+  <!-- ===== RED-ORANGE RIVER-TO-TOWN HEAT MAPS ===== -->
+<section style="background:#f7f7f7; padding:60px 20px; text-align:center">
+  <h2>River-to-Community Risk Gradients</h2>
+  <div id="map" style="width:100%; height:600px; margin:20px auto 0"></div>
+</section>
+
+<script>
+/* ----------  helper: move x metres in a bearing ---------- */
+function offset(fromLat, fromLng, distM, bearingDeg){
+  const E = 40075017;                       // earth circumference at equator
+  const latR = fromLat * Math.PI / 180;
+  const dx = distM * Math.sin(bearingDeg * Math.PI / 180);
+  const dy = distM * Math.cos(bearingDeg * Math.PI / 180);
+  const newLat = fromLat + (dy / E) * 360;
+  const newLng = fromLng + (dx / (E * Math.cos(latR))) * 360;
+  return {lat:newLat, lng:newLng};
+}
+
+/* ----------  one “candle” per community ---------- */
+const communities = [
+  //  riverLat,  riverLng,  townLat,   townLng,   extendKm,  name
+  [ 28.6800,     69.9000,   28.6873,   69.9535,   1.5,      "Rojhan" ],
+  [ 28.637671,   69.967076, 28.6500,   69.9400,   0.5,      "Kot Mithan" ],
+  [ 30.5140,     70.8580,   30.7107,   70.6475,   0.2,      "Taunsa Sharif" ],
+  [ 29.021950,   70.605799, 29.0230,   70.6200,   0.5,      "Hairo" ],
+  [ 32.627329,   73.314031, 32.640921, 73.31038,  0.3,      "Abdullahpur" ],
+  [ 32.578445,   73.040105, 32.588872, 73.043268, 0.2,      "Kandala / Pind Dadan Khan" ],
+  [ 30.025913,   71.222508, 30.070021, 71.195514, 1.5,      "Muzaffargarh" ]
+];
+
+function initMap(){
+  /* centre map on Pakistan */
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 6,
+    center: {lat:30.5, lng:71},
+    mapTypeId:"terrain"
+  });
+
+  /* build one gradient per community */
+  communities.forEach(([rLat, rLng, tLat, tLng, extKm, name]) => {
+
+    /* 1.  straight-line distance river → town */
+    const river = new google.maps.LatLng(rLat, rLng);
+    const town  = new google.maps.LatLng(tLat, tLng);
+    const legM  = google.maps.geometry.spherical.computeDistanceBetween(river, town);
+
+    /* 2.  bearing of that leg */
+    const heading = google.maps.geometry.spherical.computeHeading(river, town);
+
+    /* 3.  total length: town + extension */
+    const totalM = legM + extKm * 1000;
+
+    /* 4.  create weighted points along the line */
+    const points = [];
+    const steps  = 120;                 // more steps = smoother
+    for(let i=0; i<=steps; i++){
+      const distM = (totalM * i) / steps;
+      const p = google.maps.geometry.spherical.computeOffset(river, distM, heading);
+      /* weight: 1 (red) at river … 0 (orange end) at town+extension */
+      const w = Math.max(0, 1 - distM / totalM);
+      points.push({location:p, weight:w});
+    }
+
+    /* 5.  draw the heat layer */
+    new google.maps.visualization.HeatmapLayer({
+      data: points,
+      map: map,
+      radius: 35,
+      gradient: [
+        "rgba(255,  40,  40, 1)",   // solid red
+        "rgba(255, 109,  10, 1)",   // orange
+        "rgba(255, 180,  70, 0)"    // transparent orange
+      ]
+    });
+
+    /* optional town marker */
+    new google.maps.Marker({position:town, map, title:name});
+  });
+}
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUMMYKEYPLEASECHANGE&libraries=visualization,geometry&callback=initMap">
+</script>
+<!-- ===== END HEAT-MAP BLOCK ===== -->
+  
   </body>
 </html>
