@@ -342,7 +342,7 @@
         </div>
       </section>
       
-   <!-- =====  RIVER-TO-COMMUNITY HEAT MAP  (FIXED)  ===== -->
+<!-- =====  RIVER-TO-COMMUNITY HEAT MAP  (NO MORE RED CLOUD)  ===== -->
 <section style="background:#EFE7BC; padding:60px 20px; text-align:center; color:#000000;">
   <h1 style="margin-bottom:20px;">Flood Vulnerable Communities</h1>
   <div id="map" style="width:100%; height:600px; margin:20px auto 0;"></div>
@@ -375,18 +375,19 @@
       const totalM = legM + extKm * 1000;
 
       const points = [];
-      const steps  = 200;
+      const steps  = 300;                         // more samples
       for(let i=0; i<=steps; i++){
         const distM = (totalM * i) / steps;
         const pos   = google.maps.geometry.spherical.computeOffset(river, distM, heading);
-        const w     = (distM >= totalM) ? 0 : 1 - (distM / totalM); // force 0 at limit
+        // drop weight to 0 at 97 % of total distance → Google smear finishes inside
+        const w     = (distM >= totalM * 0.97) ? 0 : 1 - (distM / totalM);
         points.push({location:pos, weight:w});
       }
 
       new google.maps.visualization.HeatmapLayer({
         data: points,
         map: map,
-        radius: 18,                            // tighter blur
+        radius: 12,                            // much tighter
         gradient: [
           "rgba(255, 40,  40, 1)",   // red
           "rgba(255, 140, 0,  1)",   // orange
